@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101010">
+  <title>Smart Review Cards</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #101010;
+      color: #f5f1e8;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      text-align: center;
+      padding: 35px 24px;
+      background: #191919;
+      border: 1px solid #39342b;
+      border-radius: 18px;
+    }
+
+    .brand {
+      color: #d8bd83;
+      font-size: 13px;
+      letter-spacing: 4px;
+      margin-bottom: 35px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin: 0 0 12px;
+      line-height: 1.3;
+    }
+
+    p {
+      color: #b9b5ad;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .stars {
+      color: #d8bd83;
+      font-size: 31px;
+      letter-spacing: 5px;
+      margin: 20px 0;
+    }
+
+    .button {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      margin-top: 15px;
+      border-radius: 9px;
+      background: #d8bd83;
+      color: #17130c;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .whatsapp {
+      background: transparent;
+      border: 1px solid #d8bd83;
+      color: #d8bd83;
+    }
+
+    .field {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 8px;
+      border: 1px solid #514a3d;
+      background: #101010;
+      color: white;
+      font-size: 15px;
+    }
+
+    .status {
+      margin-top: 18px;
+      color: #d8bd83;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      margin-top: 30px;
+      color: #77736c;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <div class="brand">SMART REVIEW CARDS</div>
+
+    <section id="loading">
+      <h1>Loading...</h1>
+      <p>Please wait while we connect your card.</p>
+    </section>
+
+    <section id="activation" class="hidden">
+      <h1>Activate Your Card</h1>
+      <p>Enter your business details to activate this review card.</p>
+
+      <form id="activationForm">
+        <input class="field" id="pin" type="password"
+          placeholder="Activation password" required>
+
+        <input class="field" id="businessName" type="text"
+          placeholder="Business name" maxlength="100" required>
+
+        <input class="field" id="googleUrl" type="url"
+          placeholder="Google Review link" required>
+
+        <input class="field" id="whatsapp" type="tel"
+          placeholder="WhatsApp number (optional)">
+
+        <button class="button" type="submit">ACTIVATE CARD</button>
+      </form>
+
+      <div id="activationMessage" class="status"></div>
+    </section>
+
+    <section id="customer" class="hidden">
+      <h1 id="businessTitle">Welcome</h1>
+      <p>Thank you for visiting us.</p>
+
+      <div class="stars">★★★★★</div>
+
+      <h1>Enjoyed Our Service?</h1>
+      <p>Your feedback helps our business grow. Please take a moment to share your experience.</p>
+
+      <a id="reviewButton" class="button" href="#" target="_blank" rel="noopener">
+        ★ LEAVE US YOUR REVIEW
+      </a>
+
+      <a id="whatsappButton" class="button whatsapp hidden"
+        href="#" target="_blank" rel="noopener">
+        CHAT WITH US ON WHATSAPP
+      </a>
+    </section>
+
+    <section id="error" class="hidden">
+      <h1>Card Unavailable</h1>
+      <p id="errorMessage">We could not load this card.</p>
+    </section>
+
+    <div class="footer">POWERED BY SMART REVIEW CARDS</div>
+  </main>
+
+  <script>
+    const API_URL =
+      "https://lhqbfsexizyykallkmfu.supabase.co/functions/v1/activate-card-";
+
+    const cardId = window.location.pathname.match(/\/c\/(\d{2})/)?.[1]
+      || new URLSearchParams(window.location.search).get("id");
+
+    const sections = ["loading", "activation", "customer", "error"];
+
+    function showSection(name) {
+      sections.forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+      document.getElementById(name).classList.remove("hidden");
+    }
+
+    async function callAPI(data) {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Request failed");
+      }
+
+      return result;
+    }
+
+    function showError(message) {
+      document.getElementById("errorMessage").textContent = message;
+      showSection("error");
+    }
+
+    async function loadCard() {
+      if (!cardId || !/^(0[1-9]|[12][0-9]|30)$/.test(cardId)) {
+        showError("Invalid card address. Please check the QR code.");
+        return;
+      }
+
+      try {
+        const data = await callAPI({
+          action: "lookup",
+          card_id: cardId
+        });
+
+        if (data.status === "inactive") {
+          showSection("activation");
+          return;
+        }
+
+        if (!data.business_name || !data.google_url) {
+          showError("Card details are incomplete. Please contact support.");
+          return;
+        }
+
+        document.getElementById("businessTitle").textContent =
+          data.business_name;
+
+        document.getElementById("reviewButton").href =
+          data.google_url;
+
+        if (data.whatsapp_no) {
+          const whatsappButton =
+            document.getElementById("whatsappButton");
+
+          whatsappButton.href =
+            "https://wa.me/" + data.whatsapp_no +
+            "?text=" + encodeURIComponent(
+              "Hello, I visited your business and would like to connect."
+            );
+
+          whatsappButton.classList.remove("hidden");
+        }
+
+        showSection("customer");
+
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    document.getElementById("activationForm")
+      .addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const message =
+          document.getElementById("activationMessage");
+
+        const button = this.querySelector("button");
+
+        message.textContent = "Activating card...";
+        button.disabled = true;
+
+        try {
+          const result = await callAPI({
+            action: "activate",
+            card_id: cardId,
+            pin: document.getElementById("pin").value,
+            business_name:
+              document.getElementById("businessName").value,
+            google_url:
+              document.getElementById("googleUrl").value,
+            whatsapp_no:
+              document.getElementById("whatsapp").value
+          });
+
+          message.textContent = result.message;
+          this.reset();
+
+          await loadCard();
+
+        } catch (error) {
+          message.textContent = error.message;
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+    loadCard();
+  </script>
+</body>
+</html>
