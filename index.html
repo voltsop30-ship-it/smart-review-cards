@@ -7,6 +7,10 @@
   <meta name="theme-color" content="#101010">
   <title>Smart Review Cards</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+
   <style>
     * {
       box-sizing: border-box;
@@ -15,9 +19,10 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: #101010;
+      background:
+        radial-gradient(ellipse at top, #272219 0%, #101010 48%);
       color: #f5f1e8;
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -28,52 +33,70 @@
       width: 100%;
       max-width: 430px;
       text-align: center;
-      padding: 35px 24px;
-      background: #191919;
-      border: 1px solid #39342b;
-      border-radius: 18px;
+      padding: 38px 25px;
+      background: linear-gradient(145deg, #202020, #171717);
+      border: 1px solid #514630;
+      border-radius: 20px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.45);
     }
 
     .brand {
       color: #d8bd83;
-      font-size: 13px;
-      letter-spacing: 4px;
-      margin-bottom: 35px;
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 3.5px;
+      margin-bottom: 38px;
       text-transform: uppercase;
     }
 
     h1 {
-      font-size: 27px;
-      margin: 0 0 12px;
-      line-height: 1.3;
+      font-family: 'Sora', sans-serif;
+      font-size: 25px;
+      font-weight: 600;
+      margin: 0 0 13px;
+      line-height: 1.4;
     }
 
     p {
       color: #b9b5ad;
-      line-height: 1.6;
+      line-height: 1.75;
       font-size: 14px;
+      margin: 0 0 12px;
     }
 
     .stars {
       color: #d8bd83;
-      font-size: 31px;
+      font-size: 32px;
       letter-spacing: 5px;
-      margin: 20px 0;
+      margin: 23px 0;
     }
 
     .button {
       display: block;
       width: 100%;
       padding: 16px;
-      margin-top: 15px;
-      border-radius: 9px;
-      background: #d8bd83;
+      margin-top: 16px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ead6a8, #c9a967);
       color: #17130c;
       text-decoration: none;
-      font-weight: bold;
-      font-size: 15px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .4px;
       border: none;
       cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: opacity .2s ease;
+    }
+
+    .button:hover {
+      opacity: .9;
+    }
+
+    .button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
     }
 
     .whatsapp {
@@ -84,37 +107,77 @@
 
     .field {
       width: 100%;
-      padding: 14px;
-      margin-top: 12px;
-      border-radius: 8px;
+      padding: 15px;
+      margin-top: 13px;
+      border-radius: 9px;
       border: 1px solid #514a3d;
       background: #101010;
       color: white;
-      font-size: 15px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+
+    .field:focus {
+      border-color: #d8bd83;
+    }
+
+    .field::placeholder {
+      color: #77736c;
     }
 
     .status {
       margin-top: 18px;
       color: #d8bd83;
       font-size: 13px;
+      line-height: 1.6;
       overflow-wrap: anywhere;
     }
 
     .footer {
-      margin-top: 30px;
+      margin-top: 34px;
       color: #77736c;
-      font-size: 11px;
-      letter-spacing: 1px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      font-weight: 500;
+    }
+
+    .divider {
+      height: 1px;
+      background: #39342b;
+      margin: 25px 0;
+    }
+
+    .blocked-icon {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      border: 1px solid #d8bd83;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d8bd83;
+      font-size: 27px;
+    }
+
+    .blocked-label {
+      color: #d8bd83;
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      font-weight: 700;
+      margin-bottom: 13px;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
   </style>
 </head>
 
 <body>
   <main class="container">
+
     <div class="brand">SMART REVIEW CARDS</div>
 
     <section id="loading">
@@ -122,69 +185,134 @@
       <p>Please wait while we connect your card.</p>
     </section>
 
+    <!-- INACTIVE CARD -->
     <section id="activation" class="hidden">
       <h1>Activate Your Card</h1>
       <p>Enter your business details to activate this review card.</p>
 
       <form id="activationForm">
-        <input class="field" id="pin" type="password"
-          placeholder="Activation password" required>
 
-        <input class="field" id="businessName" type="text"
-          placeholder="Business name" maxlength="100" required>
+        <input class="field" id="pin"
+          type="password"
+          placeholder="Activation password"
+          required>
 
-        <input class="field" id="googleUrl" type="url"
-          placeholder="Google Review link" required>
+        <input class="field" id="businessName"
+          type="text"
+          placeholder="Business name"
+          maxlength="100"
+          required>
 
-        <input class="field" id="whatsapp" type="tel"
+        <input class="field" id="googleUrl"
+          type="url"
+          placeholder="Google Review link"
+          required>
+
+        <input class="field" id="whatsapp"
+          type="tel"
           placeholder="WhatsApp number (optional)">
 
-        <button class="button" type="submit">ACTIVATE CARD</button>
+        <button class="button" type="submit">
+          ACTIVATE CARD
+        </button>
+
       </form>
 
       <div id="activationMessage" class="status"></div>
     </section>
 
+    <!-- ACTIVE CARD -->
     <section id="customer" class="hidden">
+
       <h1 id="businessTitle">Welcome</h1>
       <p>Thank you for visiting us.</p>
 
       <div class="stars">★★★★★</div>
 
       <h1>Enjoyed Our Service?</h1>
-      <p>Your feedback helps our business grow. Please take a moment to share your experience.</p>
 
-      <a id="reviewButton" class="button" href="#" target="_blank" rel="noopener">
+      <p>
+        Your feedback helps our business grow.
+        Please take a moment to share your experience.
+      </p>
+
+      <a id="reviewButton"
+        class="button"
+        href="#"
+        target="_blank"
+        rel="noopener">
         ★ LEAVE US YOUR REVIEW
       </a>
 
-      <a id="whatsappButton" class="button whatsapp hidden"
-        href="#" target="_blank" rel="noopener">
+      <a id="whatsappButton"
+        class="button whatsapp hidden"
+        href="#"
+        target="_blank"
+        rel="noopener">
         CHAT WITH US ON WHATSAPP
       </a>
+
     </section>
 
+    <!-- BLOCKED CARD -->
+    <section id="blocked" class="hidden">
+
+      <div class="blocked-icon">!</div>
+
+      <div class="blocked-label">
+        CARD TEMPORARILY SUSPENDED
+      </div>
+
+      <h1>Card Temporarily Suspended</h1>
+
+      <div class="divider"></div>
+
+      <p>
+        This card has been temporarily suspended.
+        Please contact the provider.
+      </p>
+
+      <p style="font-size:12px; margin-top:20px;">
+        Card ID: <span id="blockedCardId"></span>
+      </p>
+
+    </section>
+
+    <!-- ERROR -->
     <section id="error" class="hidden">
       <h1>Card Unavailable</h1>
-      <p id="errorMessage">We could not load this card.</p>
+      <p id="errorMessage">
+        We could not load this card.
+      </p>
     </section>
 
-    <div class="footer">POWERED BY SMART REVIEW CARDS</div>
+    <div class="footer">
+      POWERED BY SMART REVIEW CARDS
+    </div>
+
   </main>
 
   <script>
     const API_URL =
       "https://lhqbfsexizyykallkmfu.supabase.co/functions/v1/activate-card-";
 
-    const cardId = window.location.pathname.match(/\/c\/(\d{2})/)?.[1]
+    const cardId =
+      window.location.pathname.match(/\/c\/(\d{2})/)?.[1]
       || new URLSearchParams(window.location.search).get("id");
 
-    const sections = ["loading", "activation", "customer", "error"];
+    const sections = [
+      "loading",
+      "activation",
+      "customer",
+      "blocked",
+      "error"
+    ];
 
     function showSection(name) {
       sections.forEach(id => {
         document.getElementById(id).classList.add("hidden");
       });
+
       document.getElementById(name).classList.remove("hidden");
     }
 
@@ -212,7 +340,10 @@
     }
 
     async function loadCard() {
-      if (!cardId || !/^(0[1-9]|[12][0-9]|30)$/.test(cardId)) {
+      if (
+        !cardId ||
+        !/^(0[1-9]|[12][0-9]|30)$/.test(cardId)
+      ) {
         showError("Invalid card address. Please check the QR code.");
         return;
       }
@@ -223,13 +354,31 @@
           card_id: cardId
         });
 
+        // BLOCKED CARD
+        if (data.status === "blocked") {
+          document.getElementById("blockedCardId").textContent =
+            cardId;
+
+          showSection("blocked");
+          return;
+        }
+
+        // INACTIVE CARD
         if (data.status === "inactive") {
           showSection("activation");
           return;
         }
 
+        // ACTIVE CARD
+        if (data.status !== "active") {
+          showError("Card status could not be verified.");
+          return;
+        }
+
         if (!data.business_name || !data.google_url) {
-          showError("Card details are incomplete. Please contact support.");
+          showError(
+            "Card details are incomplete. Please contact support."
+          );
           return;
         }
 
@@ -239,10 +388,10 @@
         document.getElementById("reviewButton").href =
           data.google_url;
 
-        if (data.whatsapp_no) {
-          const whatsappButton =
-            document.getElementById("whatsappButton");
+        const whatsappButton =
+          document.getElementById("whatsappButton");
 
+        if (data.whatsapp_no) {
           whatsappButton.href =
             "https://wa.me/" + data.whatsapp_no +
             "?text=" + encodeURIComponent(
@@ -250,6 +399,8 @@
             );
 
           whatsappButton.classList.remove("hidden");
+        } else {
+          whatsappButton.classList.add("hidden");
         }
 
         showSection("customer");
@@ -261,12 +412,14 @@
 
     document.getElementById("activationForm")
       .addEventListener("submit", async function(event) {
+
         event.preventDefault();
 
         const message =
           document.getElementById("activationMessage");
 
-        const button = this.querySelector("button");
+        const button =
+          this.querySelector("button");
 
         message.textContent = "Activating card...";
         button.disabled = true;
@@ -275,11 +428,15 @@
           const result = await callAPI({
             action: "activate",
             card_id: cardId,
+
             pin: document.getElementById("pin").value,
+
             business_name:
               document.getElementById("businessName").value,
+
             google_url:
               document.getElementById("googleUrl").value,
+
             whatsapp_no:
               document.getElementById("whatsapp").value
           });
@@ -291,6 +448,7 @@
 
         } catch (error) {
           message.textContent = error.message;
+
         } finally {
           button.disabled = false;
         }
